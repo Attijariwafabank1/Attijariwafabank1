@@ -1,6 +1,6 @@
 // context/AuthContext.jsx - AVEC ÉCOUTE DES ÉVÉNEMENTS
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { userService } from '../services/UserService';
+import { UserService } from '../services/UserService';
 
 const AuthContext = createContext();
 
@@ -22,11 +22,11 @@ export const AuthProvider = ({ children }) => {
     console.log('🔄 AuthContext - Initialisation');
     
     // 🔥 Forcer le rechargement des users depuis DEFAULT_USERS
-    if (userService.forceReloadInDev) {
-      userService.forceReloadInDev();
+    if (UserService.forceReloadInDev) {
+      UserService.forceReloadInDev();
     }
     
-    const currentUser = userService.getCurrentUser();
+    const currentUser = UserService.getCurrentUser();
     
     if (currentUser) {
       console.log('👤 User chargé:', currentUser);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleUserUpdate = () => {
       console.log('🔔 Événement userUpdated reçu');
-      const freshUser = userService.getCurrentUser();
+      const freshUser = UserService.getCurrentUser();
       
       if (freshUser) {
         console.log('🔄 Rechargement user:', freshUser);
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (clientNumber, code) => {
     try {
-      const userData = await userService.login(clientNumber, code);
+      const userData = await UserService.login(clientNumber, code);
       setUser({...userData});
       setIsAuthenticated(true);
       return userData;
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const newUser = await userService.register(userData);
+      const newUser = await UserService.register(userData);
       setUser({...newUser});
       setIsAuthenticated(true);
       return newUser;
@@ -84,14 +84,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    userService.logout();
+    UserService.logout();
     setUser(null);
     setIsAuthenticated(false);
   };
 
   const updateUser = async (updatedData) => {
     try {
-      const updatedUser = await userService.updateUser(updatedData);
+      const updatedUser = await UserService.updateUser(updatedData);
       // Pas besoin de setUser ici, l'événement le fera automatiquement
       return updatedUser;
     } catch (error) {
