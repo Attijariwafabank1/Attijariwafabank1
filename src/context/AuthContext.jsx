@@ -1,6 +1,6 @@
 // context/AuthContext.jsx - AVEC ÉCOUTE DES ÉVÉNEMENTS
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { userService } from '../services/userService';
+import { userService } from '../services/UserService';
 
 const AuthContext = createContext();
 
