@@ -4,7 +4,7 @@ import { ArrowLeft, Clock, ArrowUpRight, ArrowDownLeft, RefreshCw, CheckCircle, 
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import BottomNavigation from '../components/BottomNavigation';
-import { userService } from '../services/userService';
+import { UserService } from '../services/UserService';
 
 const HistoriqueTransactionsPage = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const HistoriqueTransactionsPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const user = userService.getCurrentUser();
+    const user = UserService.getCurrentUser();
     if (!user) {
       navigate('/login');
       return;
@@ -29,7 +29,7 @@ const HistoriqueTransactionsPage = () => {
   const loadTransactions = async (userId) => {
     setLoading(true);
     try {
-      const data = await userService.getUserTransactions(userId);
+      const data = await UserService.getUserTransactions(userId);
       setTransactions(data);
     } catch (error) {
       console.error('Erreur chargement transactions:', error);
@@ -40,7 +40,7 @@ const HistoriqueTransactionsPage = () => {
 
   const loadStats = async (userId) => {
     try {
-      const data = await userService.getTransactionStats(userId);
+      const data = await UserService.getTransactionStats(userId);
       setStats(data);
     } catch (error) {
       console.error('Erreur chargement stats:', error);
@@ -55,7 +55,7 @@ const HistoriqueTransactionsPage = () => {
     } else {
       setLoading(true);
       try {
-        const results = await userService.searchTransactions(currentUser.id, searchTerm);
+        const results = await UserService.searchTransactions(currentUser.id, searchTerm);
         setTransactions(results);
       } catch (error) {
         console.error('Erreur recherche:', error);
