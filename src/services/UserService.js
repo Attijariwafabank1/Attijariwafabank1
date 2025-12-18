@@ -47,22 +47,72 @@ const DEFAULT_TRANSACTIONS = [
     frais: 25,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121745678'
+    reference: 'TRX2025121745678',
+    motif: 'Virement mensuel'
+  },
+  {
+    id: 'TRX2025121899999',
+    userId: '1',
+    date: '2023-12-18',
+    heure: '10:30',
+    type: 'Envoi',
+    accountType: 'LIQUIDITE',
+    destinataire: 'MARIE DUBOIS',
+    numeroDestinataire: 'FR76 1234 5678 9012 3456 7890 123',
+    montant: 2500,
+    frais: 12.5,
+    devise: '€',
+    statut: 'En attente',
+    reference: 'TRX2025121899999',
+    motif: 'Loyer décembre'
+  },
+  {
+    id: 'TRX2025121888888',
+    userId: '1',
+    date: '2024-12-17',
+    heure: '16:45',
+    type: 'Envoi',
+    accountType: 'LIQUIDITE',
+    destinataire: 'LUC MOREAU',
+    numeroDestinataire: 'FR76 3333 4444 5555 6666 7777 888',
+    montant: 2000,
+    frais: 10,
+    devise: '€',
+    statut: 'En attente',
+    reference: 'TRX2025121888888',
+    motif: 'Virement mensuel'
+  },
+  {
+    id: 'TRX2025121877777',
+    userId: '1',
+    date: '2024-12-15',
+    heure: '09:15',
+    type: 'Envoi',
+    accountType: 'LIQUIDITE',
+    destinataire: 'MARIE MARTIN',
+    numeroDestinataire: 'FR76 9876 5432 1098 7654 3210 987',
+    montant: 1250.50,
+    frais: 6.25,
+    devise: '€',
+    statut: 'En attente',
+    reference: 'TRX2025121877777',
+    motif: 'Facture électricité'
   },
   {
     id: 'TRX2025121634521',
     userId: '1',
     date: '2022-07-21',
     heure: '09:15',
-    type: 'envoie',
+    type: 'Envoi',
     accountType: 'LIQUIDITE',
     destinataire: 'BARRIL ANTHONY',
     numeroDestinataire: 'FR76 1780 6001 8404 1676 6849 143',
     montant: 15000,
-    frais: 0,
+    frais: 75,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121634521'
+    reference: 'TRX2025121634521',
+    motif: 'Transfert familial'
   },
   {
     id: 'TRX2025121523456',
@@ -77,7 +127,8 @@ const DEFAULT_TRANSACTIONS = [
     frais: 15,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121523456'
+    reference: 'TRX2025121523456',
+    motif: 'Achat matériel'
   },
   {
     id: 'TRX2025121512345',
@@ -92,7 +143,8 @@ const DEFAULT_TRANSACTIONS = [
     frais: 100,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121512345'
+    reference: 'TRX2025121512345',
+    motif: 'Retrait espèces'
   },
   {
     id: 'TRX2025121478901',
@@ -108,7 +160,25 @@ const DEFAULT_TRANSACTIONS = [
     devise: '€',
     statut: 'Échouée',
     reference: 'TRX2025121478901',
-    motifEchec: 'Solde insuffisant'
+    motifEchec: 'Solde insuffisant',
+    motif: 'Paiement fournisseur'
+  },
+  {
+    id: 'TRX2025121466666',
+    userId: '1',
+    date: '2023-11-13',
+    heure: '11:20',
+    type: 'Envoi',
+    accountType: 'LIQUIDITE',
+    destinataire: 'SOPHIE BERNARD',
+    numeroDestinataire: 'FR76 7777 8888 9999 0000 1111 222',
+    montant: 75,
+    frais: 0.38,
+    devise: '€',
+    statut: 'Échouée',
+    reference: 'TRX2025121466666',
+    motifEchec: 'IBAN invalide',
+    motif: 'Cadeau anniversaire'
   },
   {
     id: 'TRX2025121367890',
@@ -123,7 +193,8 @@ const DEFAULT_TRANSACTIONS = [
     frais: 0,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121367890'
+    reference: 'TRX2025121367890',
+    motif: 'Dépôt espèces'
   },
   {
     id: 'TRX2025121256789',
@@ -135,15 +206,32 @@ const DEFAULT_TRANSACTIONS = [
     destinataire: 'BARRIL ANTHONY',
     numeroDestinataire: 'FR76 1780 6001 8404 1676 6849 143',
     montant: 7500,
-    frais: 37,
+    frais: 37.5,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121256789'
+    reference: 'TRX2025121256789',
+    motif: 'Investissement'
+  },
+  {
+    id: 'TRX2025121155555',
+    userId: '1',
+    date: '2023-12-14',
+    heure: '16:45',
+    type: 'Envoi',
+    accountType: 'ECONOMIE',
+    destinataire: 'PIERRE LEROY',
+    numeroDestinataire: 'FR76 1111 2222 3333 4444 5555 666',
+    montant: 300,
+    frais: 1.5,
+    devise: '€',
+    statut: 'Réussie',
+    reference: 'TRX2025121155555',
+    motif: 'Remboursement'
   },
   {
     id: 'TRX2025121145678',
     userId: '1',
-    date: '2025-12-11',
+    date: '2022-12-11',
     heure: '15:25',
     type: 'Transfert compte',
     accountType: 'LIQUIDITE',
@@ -153,7 +241,8 @@ const DEFAULT_TRANSACTIONS = [
     frais: 0,
     devise: '€',
     statut: 'Réussie',
-    reference: 'TRX2025121145678'
+    reference: 'TRX2025121145678',
+    motif: 'Transfert interne'
   }
 ];
 

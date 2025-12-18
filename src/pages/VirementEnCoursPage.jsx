@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { UserService } from '../services/UserService';
 import { ArrowLeft, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -10,104 +11,69 @@ const VirementEnCoursPage = () => {
   const navigate = useNavigate();
   const [virements, setVirements] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('tous'); // tous, en_attente, valide, echoue
-
-  // Données de test - virements en cours (UNIQUEMENT pour les anciens utilisateurs)
-  const virementsTest = [
-    {
-      id: '1',
-      beneficiaire: 'Jean Dupont',
-      iban: 'FR76 1234 5678 9012 3456 7890 123',
-      montant: 500.00,
-      motif: 'Loyer Décembre',
-      date: '15/12/2025',
-      statut: 'en_attente',
-      accountType: 'LIQUIDITE',
-      heureCreation: '14:30'
-    },
-    {
-      id: '2',
-      beneficiaire: 'Marie Martin',
-      iban: 'FR76 9876 5432 1098 7654 3210 987',
-      montant: 1250.50,
-      motif: 'Facture électricité',
-      date: '16/12/2025',
-      statut: 'en_cours',
-      accountType: 'LIQUIDITE',
-      heureCreation: '09:15'
-    },
-    {
-      id: '3',
-      beneficiaire: 'Pierre Leroy',
-      iban: 'FR76 1111 2222 3333 4444 5555 666',
-      montant: 300.00,
-      motif: 'Remboursement',
-      date: '14/12/2025',
-      statut: 'valide',
-      accountType: 'ECONOMIE',
-      heureCreation: '16:45'
-    },
-    {
-      id: '4',
-      beneficiaire: 'Sophie Bernard',
-      iban: 'FR76 7777 8888 9999 0000 1111 222',
-      montant: 75.00,
-      motif: 'Cadeau anniversaire',
-      date: '13/12/2025',
-      statut: 'echoue',
-      accountType: 'LIQUIDITE',
-      heureCreation: '11:20',
-      raisonEchec: 'IBAN invalide'
-    },
-    {
-      id: '5',
-      beneficiaire: 'Luc Moreau',
-      iban: 'FR76 3333 4444 5555 6666 7777 888',
-      montant: 2000.00,
-      motif: 'Virement mensuel',
-      date: '17/12/2025',
-      statut: 'en_attente',
-      accountType: 'LIQUIDITE',
-      heureCreation: '08:00'
-    }
-  ];
+  const [filter, setFilter] = useState('tous'); // tous, En attente, Réussie, Échouée
 
   useEffect(() => {
-    // ✅ Si c'est un nouvel utilisateur, ne rien afficher
-    setTimeout(() => {
-      if (user && user.isNewUser) {
-        setVirements([]); // Vide pour les nouveaux utilisateurs
-      } else {
-        setVirements(virementsTest); // Données test pour les anciens
+    const loadVirements = async () => {
+      if (user) {
+        try {
+          setLoading(true);
+          // Charger toutes les transactions de l'utilisateur
+          const transactions = await UserService.getUserTransactions(user.id);
+          
+          // Convertir les transactions en format virements
+          const virementsFormates = transactions.map(t => ({
+            id: t.id,
+            beneficiaire: t.destinataire,
+            iban: t.numeroDestinataire,
+            montant: t.montant,
+            motif: t.motif || 'Virement',
+            date: new Date(t.date).toLocaleDateString('fr-FR'),
+            statut: t.statut, // "Réussie", "Échouée", "En attente"
+            accountType: t.accountType,
+            heureCreation: t.heure,
+            reference: t.reference,
+            raisonEchec: t.motifEchec,
+            frais: t.frais,
+            devise: t.devise
+          }));
+          
+          setVirements(virementsFormates);
+        } catch (error) {
+          console.error('Erreur chargement virements:', error);
+        } finally {
+          setLoading(false);
+        }
       }
-      setLoading(false);
-    }, 800);
+    };
+
+    loadVirements();
   }, [user]);
 
   const getStatutConfig = (statut) => {
     const configs = {
-      en_attente: {
+      'En attente': {
         label: 'En attente',
         color: 'text-yellow-600',
         bgColor: 'bg-yellow-50',
         borderColor: 'border-yellow-200',
         icon: Clock
       },
-      en_cours: {
+      'En cours': {
         label: 'En cours',
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         borderColor: 'border-blue-200',
         icon: RefreshCw
       },
-      valide: {
+      'Réussie': {
         label: 'Validé',
         color: 'text-green-600',
         bgColor: 'bg-green-50',
         borderColor: 'border-green-200',
         icon: CheckCircle
       },
-      echoue: {
+      'Échouée': {
         label: 'Échoué',
         color: 'text-red-600',
         bgColor: 'bg-red-50',
@@ -115,13 +81,14 @@ const VirementEnCoursPage = () => {
         icon: XCircle
       }
     };
-    return configs[statut] || configs.en_attente;
+    return configs[statut] || configs['En attente'];
   };
 
   const handleAnnuler = (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir annuler ce virement ?')) {
+      // Mise à jour locale uniquement (en production, faire un appel API)
       setVirements(virements.map(v => 
-        v.id === id ? { ...v, statut: 'echoue', raisonEchec: 'Annulé par l\'utilisateur' } : v
+        v.id === id ? { ...v, statut: 'Échouée', raisonEchec: 'Annulé par l\'utilisateur' } : v
       ));
     }
   };
@@ -175,44 +142,34 @@ const VirementEnCoursPage = () => {
                 Tous ({virements.length})
               </button>
               <button
-                onClick={() => setFilter('en_attente')}
+                onClick={() => setFilter('En attente')}
                 className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
-                  filter === 'en_attente' 
+                  filter === 'En attente' 
                     ? 'bg-yellow-500 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                En attente ({virements.filter(v => v.statut === 'en_attente').length})
+                En attente ({virements.filter(v => v.statut === 'En attente').length})
               </button>
               <button
-                onClick={() => setFilter('en_cours')}
+                onClick={() => setFilter('Réussie')}
                 className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
-                  filter === 'en_cours' 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                En cours ({virements.filter(v => v.statut === 'en_cours').length})
-              </button>
-              <button
-                onClick={() => setFilter('valide')}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
-                  filter === 'valide' 
+                  filter === 'Réussie' 
                     ? 'bg-green-500 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                Validés ({virements.filter(v => v.statut === 'valide').length})
+                Validés ({virements.filter(v => v.statut === 'Réussie').length})
               </button>
               <button
-                onClick={() => setFilter('echoue')}
+                onClick={() => setFilter('Échouée')}
                 className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
-                  filter === 'echoue' 
+                  filter === 'Échouée' 
                     ? 'bg-red-500 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                Échoués ({virements.filter(v => v.statut === 'echoue').length})
+                Échoués ({virements.filter(v => v.statut === 'Échouée').length})
               </button>
             </div>
           </div>
@@ -223,7 +180,7 @@ const VirementEnCoursPage = () => {
           {virementsAffiches.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-8 text-center">
               <AlertCircle className="mx-auto text-gray-400 mb-3" size={48} />
-              <p className="text-gray-600 text-lg">Aucun virement en cours</p>
+              <p className="text-gray-600 text-lg">Aucun virement {filter !== 'tous' ? filter.toLowerCase() : ''}</p>
               <p className="text-gray-400 text-sm mt-2">
                 {user && user.isNewUser 
                   ? 'Effectuez votre premier virement pour le voir apparaître ici'
@@ -251,7 +208,7 @@ const VirementEnCoursPage = () => {
                       <p className="text-sm text-gray-500">{virement.iban}</p>
                     </div>
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${config.bgColor} ${config.color}`}>
-                      <Icon size={16} className={virement.statut === 'en_cours' ? 'animate-spin' : ''} />
+                      <Icon size={16} className={virement.statut === 'En cours' ? 'animate-spin' : ''} />
                       <span className="font-medium text-sm">{config.label}</span>
                     </div>
                   </div>
@@ -260,7 +217,7 @@ const VirementEnCoursPage = () => {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Montant</p>
                       <p className="text-xl font-bold text-gray-800">
-                        {virement.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
+                        {virement.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} {virement.devise}
                       </p>
                     </div>
                     <div>
@@ -278,8 +235,16 @@ const VirementEnCoursPage = () => {
 
                   <div className="flex justify-between items-center text-xs text-gray-500 mb-3">
                     <span>Date: {virement.date} à {virement.heureCreation}</span>
-                    <span>ID: #{virement.id}</span>
+                    <span>Réf: {virement.reference}</span>
                   </div>
+
+                  {virement.frais > 0 && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-3">
+                      <p className="text-xs text-blue-700">
+                        <strong>Frais:</strong> {virement.frais.toLocaleString('fr-FR', {minimumFractionDigits: 2})} {virement.devise}
+                      </p>
+                    </div>
+                  )}
 
                   {virement.raisonEchec && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
@@ -289,7 +254,7 @@ const VirementEnCoursPage = () => {
                     </div>
                   )}
 
-                  {virement.statut === 'en_attente' && (
+                  {virement.statut === 'En attente' && (
                     <button
                       onClick={() => handleAnnuler(virement.id)}
                       className="w-full bg-red-50 text-red-600 py-2 rounded-lg font-medium text-sm hover:bg-red-100 transition"
@@ -298,7 +263,7 @@ const VirementEnCoursPage = () => {
                     </button>
                   )}
 
-                  {virement.statut === 'valide' && (
+                  {virement.statut === 'Réussie' && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <p className="text-sm text-green-700 text-center">
                         ✓ Virement effectué avec succès
