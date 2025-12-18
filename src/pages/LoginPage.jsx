@@ -168,12 +168,7 @@ const LoginPage = () => {
           </p>
         </div>
 
-        {/* Info de test */}
-        <div className="mt-8 p-4 bg-white/40 rounded-xl">
-          <p className="text-xs text-gray-700 font-semibold mb-2">💡 Compte de test :</p>
-          <p className="text-xs text-gray-600">N° Client: 27148050000 (11 chiffres)</p>
-          <p className="text-xs text-gray-600">Code: 123456 (6 chiffres)</p>
-        </div>
+      
       </div>
     </div>
   );
