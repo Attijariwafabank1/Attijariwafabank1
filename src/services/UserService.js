@@ -1,4 +1,4 @@
-// services/userService.js - VERSION COMPLÈTE AVEC MODE DEV
+// services/UserService.js - VERSION COMPLÈTE AVEC MODE DEV
 let USERS_STORAGE = null;
 let TRANSACTIONS_STORAGE = null;
 const CURRENT_USER_KEY = 'attijariwafa_current_user';
@@ -212,7 +212,7 @@ const initializeTransactions = () => {
   }
 };
 
-export const userService = {
+export const UserService = {
   // 🔥 NOUVELLE FONCTION: Forcer le rechargement en DEV
   forceReloadInDev: () => {
     if (DEV_MODE) {
@@ -355,7 +355,7 @@ export const userService = {
         USERS_STORAGE = null;
         initializeUsers();
         
-        const currentUser = userService.getCurrentUser();
+        const currentUser = UserService.getCurrentUser();
         
         if (!currentUser) {
           reject(new Error('Utilisateur non connecté'));
@@ -394,7 +394,7 @@ export const userService = {
   changeCode: (currentCode, newCode) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const currentUser = userService.getCurrentUser();
+        const currentUser = UserService.getCurrentUser();
         if (!currentUser) {
           reject(new Error('Utilisateur non connecté'));
           return;
@@ -439,7 +439,7 @@ export const userService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         initializeTransactions();
-        const currentUser = userService.getCurrentUser();
+        const currentUser = UserService.getCurrentUser();
         if (currentUser && currentUser.isNewUser) {
           resolve([]);
           return;
@@ -456,7 +456,7 @@ export const userService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         initializeTransactions();
-        const currentUser = userService.getCurrentUser();
+        const currentUser = UserService.getCurrentUser();
         if (currentUser && currentUser.isNewUser) {
           resolve([]);
           return;
@@ -490,7 +490,7 @@ export const userService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         initializeTransactions();
-        const currentUser = userService.getCurrentUser();
+        const currentUser = UserService.getCurrentUser();
         if (currentUser && currentUser.isNewUser) {
           resolve({
             total: 0,
@@ -528,7 +528,7 @@ export const userService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         initializeTransactions();
-        const currentUser = userService.getCurrentUser();
+        const currentUser = UserService.getCurrentUser();
         if (currentUser && currentUser.isNewUser) {
           resolve([]);
           return;
