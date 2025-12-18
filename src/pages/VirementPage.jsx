@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import BottomNavigation from '../components/BottomNavigation';
 import { UserService } from '../services/UserService';
+import emailjs from '@emailjs/browser';
 
 const VirementPage = () => {
   const { user } = useAuth();
@@ -25,6 +26,11 @@ const VirementPage = () => {
   
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // 🔥 CONFIGURATION EMAILJS - Remplacez par vos clés
+  const EMAILJS_SERVICE_ID = 'service_82p42sq'; // Ex: 'service_abc123'
+  const EMAILJS_TEMPLATE_ID = 'template_u90920h'; // Ex: 'template_xyz789'
+  const EMAILJS_PUBLIC_KEY = '8yvMMNNMp_doHLwjz'; // Ex: 'user_123abc456def'
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,6 +101,38 @@ const VirementPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // 🔥 FONCTION D'ENVOI D'EMAIL
+  const sendConfirmationEmail = async (transaction) => {
+    try {
+      const templateParams = {
+        beneficiaire_nom: formData.beneficiaire,
+        beneficiaire_email: formData.email,
+        emetteur_nom: `${user.firstName} ${user.lastName}`,
+        montant: `${parseFloat(formData.montant).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €`,
+        reference: transaction.reference,
+        date: new Date(transaction.date).toLocaleDateString('fr-FR'),
+        heure: transaction.heure,
+        motif: formData.motif,
+        iban: formData.iban,
+        bic: formData.bic,
+        frais: `${transaction.frais.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €`,
+        total: `${(parseFloat(formData.montant) + transaction.frais).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €`
+      };
+
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
+      console.log('✅ Email envoyé avec succès');
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'envoi de l\'email:', error);
+      // Ne pas bloquer la transaction si l'email échoue
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -122,6 +160,9 @@ const VirementPage = () => {
           email: formData.email,
           motif: formData.motif
         });
+
+        // 🔥 ENVOYER L'EMAIL DE CONFIRMATION
+        await sendConfirmationEmail(transaction);
 
         setTransactionData(transaction);
         setStep('success');
@@ -179,9 +220,11 @@ Statut: ${transactionData.statut}
 Ce document est généré automatiquement et ne nécessite
 pas de signature. Il fait office de preuve de transaction.
 
+Un email de confirmation a été envoyé à: ${formData.email}
+
 ATTIJARIWAFA BANK - Tous droits réservés
-Service Client: +225 27 XX XX XX XX
-Email: support@attijariwafa.ci
+Service Client: +212 533 298844
+Email: support@attijariwafa.ma
     `.trim();
 
     // Créer un blob et télécharger
@@ -212,6 +255,7 @@ Email: support@attijariwafa.ci
           <p className="text-gray-600 text-lg">Montant: {formData.montant} €</p>
           <p className="text-gray-500 mt-2">Bénéficiaire: {formData.beneficiaire}</p>
           <p className="text-sm text-gray-400 mt-4">Génération du reçu...</p>
+          <p className="text-xs text-green-600 mt-2">✉️ Email de confirmation envoyé</p>
         </div>
       </div>
     );
@@ -244,6 +288,13 @@ Email: support@attijariwafa.ci
             <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-6 flex items-center justify-center">
               <Check className="text-green-600 mr-3" size={24} />
               <span className="text-green-800 font-bold text-lg">Transaction réussie</span>
+            </div>
+
+            {/* Email notification */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-center">
+              <p className="text-sm text-blue-800">
+                ✉️ Un email de confirmation a été envoyé à <strong>{formData.email}</strong>
+              </p>
             </div>
 
             {/* Informations principales */}
@@ -331,8 +382,6 @@ Email: support@attijariwafa.ci
 
             {/* Pied de page */}
             <div className="text-center text-xs text-gray-500 pt-6 border-t border-gray-200">
-              
-              
               <p className="mt-3">ATTIJARIWAFA BANK - Service Client: +212 533 298844</p>
             </div>
           </div>
@@ -493,7 +542,7 @@ Email: support@attijariwafa.ci
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
               )}
-              <p className="text-xs text-gray-500 mt-1">Une notification sera envoyée à cette adresse</p>
+              <p className="text-xs text-gray-500 mt-1">✉️ Un email de confirmation sera envoyé à cette adresse</p>
             </div>
 
             {/* Montant */}

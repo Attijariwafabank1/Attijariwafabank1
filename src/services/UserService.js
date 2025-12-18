@@ -1,11 +1,12 @@
-// services/UserService.js - VERSION COMPLÈTE AVEC MODE DEV
+// services/UserService.js - VERSION COMPLÈTE AVEC MODE DEV AMÉLIORÉ
 let USERS_STORAGE = null;
 let TRANSACTIONS_STORAGE = null;
 const CURRENT_USER_KEY = 'attijariwafa_current_user';
 const USERS_DB_KEY = 'attijariwafa_users_db';
 
 // 🔥 MODE DÉVELOPPEMENT - Met false en production
-const DEV_MODE = true;
+const DEV_MODE = false;
+const MERGE_DEFAULT_USERS = true; // ✅ Fusionne DEFAULT_USERS avec les inscrits
 
 const DEFAULT_USERS = [
   {
@@ -265,15 +266,69 @@ const loadUsersFromStorage = () => {
   return false;
 };
 
-// 🔥 INITIALISATION AVEC MODE DEV
+// 🔥 INITIALISATION AVEC MODE DEV AMÉLIORÉ
 const initializeUsers = () => {
-  if (DEV_MODE) {
-    // 🔥 EN MODE DEV: TOUJOURS recharger depuis DEFAULT_USERS
+  if (DEV_MODE && MERGE_DEFAULT_USERS) {
+    const stored = localStorage.getItem(USERS_DB_KEY);
+    
+    if (stored) {
+      // ✅ Charger les utilisateurs existants (inscrits)
+      const existingUsers = JSON.parse(stored);
+      
+      // ✅ Fusionner avec DEFAULT_USERS
+      // Mettre à jour les utilisateurs par défaut OU les ajouter s'ils n'existent pas
+      DEFAULT_USERS.forEach(defaultUser => {
+        const existingIndex = existingUsers.findIndex(
+          u => u.clientNumber === defaultUser.clientNumber
+        );
+        
+        if (existingIndex !== -1) {
+          // Utilisateur existe déjà → Mettre à jour SAUF le code
+          const existingCode = existingUsers[existingIndex].code;
+          const existingId = existingUsers[existingIndex].id;
+          existingUsers[existingIndex] = {
+            ...defaultUser,
+            code: existingCode, // Garder le code existant
+            id: existingId      // Garder l'ID existant
+          };
+        } else {
+          // Nouvel utilisateur par défaut → L'ajouter
+          existingUsers.push(defaultUser);
+        }
+      });
+      
+      USERS_STORAGE = existingUsers;
+      saveUsersToStorage();
+      console.log('🔧 DEV MODE: Fusion réussie -', USERS_STORAGE.length, 'utilisateurs');
+    } else {
+      // Première initialisation
+      USERS_STORAGE = JSON.parse(JSON.stringify(DEFAULT_USERS));
+      saveUsersToStorage();
+      console.log('🔧 DEV MODE: Première initialisation');
+    }
+    
+    // Mettre à jour le current user s'il fait partie de DEFAULT_USERS
+    const currentUserStored = localStorage.getItem(CURRENT_USER_KEY);
+    if (currentUserStored) {
+      const currentUser = JSON.parse(currentUserStored);
+      const isDefaultUser = DEFAULT_USERS.some(u => u.clientNumber === currentUser.clientNumber);
+      
+      if (isDefaultUser) {
+        const freshUser = USERS_STORAGE.find(u => u.clientNumber === currentUser.clientNumber);
+        if (freshUser) {
+          const { code: _, ...userWithoutCode } = freshUser;
+          localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userWithoutCode));
+          notifyUserUpdate();
+          console.log('✅ Current user mis à jour');
+        }
+      }
+    }
+  } else if (DEV_MODE && !MERGE_DEFAULT_USERS) {
+    // Mode DEV original (écrase tout)
     console.log('🔧 DEV MODE: Rechargement depuis DEFAULT_USERS');
     USERS_STORAGE = JSON.parse(JSON.stringify(DEFAULT_USERS));
     saveUsersToStorage();
     
-    // 🔥 Mettre à jour le current user aussi
     const currentUserStored = localStorage.getItem(CURRENT_USER_KEY);
     if (currentUserStored) {
       const currentUser = JSON.parse(currentUserStored);
@@ -281,12 +336,12 @@ const initializeUsers = () => {
       if (freshUser) {
         const { code: _, ...userWithoutCode } = freshUser;
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userWithoutCode));
-        notifyUserUpdate(); // 🔥 Notifier React
+        notifyUserUpdate();
         console.log('✅ Current user mis à jour');
       }
     }
   } else if (!USERS_STORAGE) {
-    // MODE PROD: Charger depuis localStorage une seule fois
+    // MODE PROD: Charger depuis localStorage
     const loaded = loadUsersFromStorage();
     if (!loaded) {
       USERS_STORAGE = JSON.parse(JSON.stringify(DEFAULT_USERS));
@@ -306,8 +361,8 @@ export const UserService = {
   forceReloadInDev: () => {
     if (DEV_MODE) {
       console.log('🔧 Force reload in DEV mode');
-      USERS_STORAGE = null; // Reset
-      initializeUsers(); // Recharge depuis DEFAULT_USERS
+      USERS_STORAGE = null;
+      initializeUsers();
     }
   },
 
