@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, X, Copy, Check } from 'lucide-react';
-import { userService } from '../services/userService';
+import { UserService } from '../services/UserService';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -78,7 +78,7 @@ const RegisterPage = () => {
       const newId = generateClientId();
       
       // ✅ Créer l'utilisateur SANS connexion automatique
-      await userService.registerWithoutLogin({
+      await UserService.registerWithoutLogin({
         clientNumber: newId,
         firstName: formData.firstName,
         lastName: formData.lastName,

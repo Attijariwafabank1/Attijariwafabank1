@@ -5,7 +5,7 @@ import { ArrowLeft, Send, AlertCircle, Check, Download, Printer } from 'lucide-r
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import BottomNavigation from '../components/BottomNavigation';
-import { userService } from '../services/userService';
+import { UserService } from '../services/UserService';
 
 const VirementPage = () => {
   const { user } = useAuth();
@@ -108,7 +108,7 @@ const VirementPage = () => {
     setTimeout(async () => {
       try {
         // Créer la transaction
-        const transaction = await userService.addTransaction({
+        const transaction = await UserService.addTransaction({
           userId: user.id,
           type: 'Envoi',
           accountType: formData.accountType,
