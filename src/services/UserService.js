@@ -23,12 +23,35 @@ const DEFAULT_USERS = [
     postalCode: '08 BP 123',
     country: 'MAROC',
     accounts: [
-      { type: 'LIQUIDITE', balance: 17541386.85, currency: '€', color: 'blue' },
-      { type: 'ASSURANCE', balance: 2700.00, currency: '€', color: 'red' },
-      { type: 'ECONOMIE', balance: 15000.00, currency: '€', color: 'green' },
-      { type: 'EPARGNE', balance: 2100.00, currency: '€', color: 'yellow' }
+      { type: 'LIQUIDITE', balance: 17541386.85, currency: 'MAD', color: 'blue' },
+      { type: 'ASSURANCE', balance: 2700.00, currency: 'MAD', color: 'red' },
+      { type: 'ECONOMIE', balance: 15000.00, currency: 'MAD', color: 'green' },
+      { type: 'EPARGNE', balance: 2100.00, currency: 'MAD', color: 'yellow' }
     ],
     blockedAmount: 567115.31,
+    lastUpdate: '25 / 10 / 2025',
+    isNewUser: false
+  },
+  {
+    id: '2',
+    clientNumber: '27248050000',
+    cardNumber: '1301 0215 9290 1200 ',
+    code: '123457',
+    firstName: 'NATHALIE',
+    lastName: 'ROUSSEL',
+    email: 'nathalie.roussel@email.com',
+    phone: '+212 576 678912',
+    address: 'Boulevard Molay Youssef, 20000 Cassablanca',
+    city: 'Casablanca',
+    postalCode: '08 BP 123',
+    country: 'MAROC',
+    accounts: [
+      { type: 'LIQUIDITE', balance: 2853550.85, currency: 'MAD', color: 'blue' },
+      { type: 'ASSURANCE', balance: 2700.00, currency: 'MAD', color: 'red' },
+      { type: 'ECONOMIE', balance: 15000.00, currency: 'MAD', color: 'green' },
+      { type: 'EPARGNE', balance: 2100.00, currency: 'MAD', color: 'yellow' }
+    ],
+    blockedAmount: 162750.31,
     lastUpdate: '25 / 10 / 2025',
     isNewUser: false
   }
@@ -46,7 +69,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 3000 4560 4856 7455 3646 748',
     montant: 5000,
     frais: 25,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121745678',
     motif: 'Virement mensuel'
@@ -62,7 +85,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 1234 5678 9012 3456 7890 123',
     montant: 2500,
     frais: 12.5,
-    devise: '€',
+    devise: 'MAD',
     statut: 'En attente',
     reference: 'TRX2025121899999',
     motif: 'Loyer décembre'
@@ -78,7 +101,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 3333 4444 5555 6666 7777 888',
     montant: 2000,
     frais: 10,
-    devise: '€',
+    devise: 'MAD',
     statut: 'En attente',
     reference: 'TRX2025121888888',
     motif: 'Virement mensuel'
@@ -94,7 +117,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 9876 5432 1098 7654 3210 987',
     montant: 1250.50,
     frais: 6.25,
-    devise: '€',
+    devise: 'MAD',
     statut: 'En attente',
     reference: 'TRX2025121877777',
     motif: 'Facture électricité'
@@ -110,7 +133,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 1780 6001 8404 1676 6849 143',
     montant: 15000,
     frais: 75,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121634521',
     motif: 'Transfert familial'
@@ -126,7 +149,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'MA64 1234 2333 5373 2734 123',
     montant: 3000,
     frais: 15,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121523456',
     motif: 'Achat matériel'
@@ -142,7 +165,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'ATM-CASSABLANCA-001',
     montant: 20000,
     frais: 100,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121512345',
     motif: 'Retrait espèces'
@@ -158,7 +181,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 1580 6801 8404 1676 6849 143',
     montant: 10000,
     frais: 50,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Échouée',
     reference: 'TRX2025121478901',
     motifEchec: 'Solde insuffisant',
@@ -175,7 +198,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 7777 8888 9999 0000 1111 222',
     montant: 75,
     frais: 0.38,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Échouée',
     reference: 'TRX2025121466666',
     motifEchec: 'IBAN invalide',
@@ -192,7 +215,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'AGENT-CASSABLANCA-003',
     montant: 50000,
     frais: 0,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121367890',
     motif: 'Dépôt espèces'
@@ -208,7 +231,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 1780 6001 8404 1676 6849 143',
     montant: 7500,
     frais: 37.5,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121256789',
     motif: 'Investissement'
@@ -224,7 +247,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'FR76 1111 2222 3333 4444 5555 666',
     montant: 300,
     frais: 1.5,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121155555',
     motif: 'Remboursement'
@@ -240,7 +263,7 @@ const DEFAULT_TRANSACTIONS = [
     numeroDestinataire: 'Compte ECONOMIE',
     montant: 10000,
     frais: 0,
-    devise: '€',
+    devise: 'MAD',
     statut: 'Réussie',
     reference: 'TRX2025121145678',
     motif: 'Transfert interne'
